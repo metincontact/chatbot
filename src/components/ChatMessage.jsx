@@ -1,19 +1,29 @@
-import RobotProfileImage from "../assets/robot.png";
-import UserProfileImage from "../assets/user.png";
-import "./ChatMessage.css";
-
 export function ChatMessage({ message, sender }) {
+  const isUser = sender === "user";
+
   return (
     <div
-      className={sender === "user" ? "chat-message-user" : "chat-message-robot"}
+      className={`flex items-end gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}
     >
-      {sender === "robot" && (
-        <img src={RobotProfileImage} className="chat-message-profile" />
-      )}
-      <div className="chat-message-text">{message}</div>
-      {sender === "user" && (
-        <img src={UserProfileImage} className="chat-message-profile" />
-      )}
+      {/* Avatar */}
+      <div
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 ${
+          isUser ? "bg-blue-600" : "bg-slate-600"
+        }`}
+      >
+        {isUser ? "👤" : "🤖"}
+      </div>
+
+      {/* Bubble */}
+      <div
+        className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+          isUser
+            ? "bg-blue-600 text-white rounded-br-sm"
+            : "bg-slate-700 text-slate-100 rounded-bl-sm"
+        }`}
+      >
+        {message}
+      </div>
     </div>
   );
 }
