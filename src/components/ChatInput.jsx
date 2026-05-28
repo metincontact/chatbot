@@ -20,54 +20,62 @@ export function ChatInput({ chatMessages, setChatMessages }) {
     };
 
     const newMessages = [...chatMessages, userMessage];
+    const currentInput = inputText;
     setChatMessages(newMessages);
     setInputText("");
     setLoading(true);
 
-    try {
-      const history = chatMessages.map((msg) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.message }],
-      }));
+    const history = chatMessages.slice(-10).map((msg) => ({
+      role: msg.sender === "user" ? "user" : "model",
+      parts: [{ text: msg.message }],
+    }));
 
+    async function callApi(retries = 3, delay = 1000) {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents: [
               ...history,
-              { role: "user", parts: [{ text: inputText }] },
+              { role: "user", parts: [{ text: currentInput }] },
             ],
-            generationConfig: {
-              maxOutputTokens: 1000,
-            },
+            generationConfig: { maxOutputTokens: 1000 },
           }),
         },
       );
 
-      const data = await response.json();
+      if (response.status === 429 && retries > 0) {
+        await new Promise((r) => setTimeout(r, delay));
+        return callApi(retries - 1, delay * 2);
+      }
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    try {
+      const data = await callApi();
       const reply =
         data.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Sorry, I could not generate a response.";
 
       setChatMessages([
         ...newMessages,
-        {
-          message: reply,
-          sender: "robot",
-          id: crypto.randomUUID(),
-        },
+        { message: reply, sender: "robot", id: crypto.randomUUID() },
       ]);
-    } catch {
+    } catch (error) {
+      const message = error.message.includes("429")
+        ? "Too many requests. Please wait a moment and try again."
+        : "Something went wrong. Please try again.";
+
       setChatMessages([
         ...newMessages,
-        {
-          message: "Something went wrong. Please try again.",
-          sender: "robot",
-          id: crypto.randomUUID(),
-        },
+        { message, sender: "robot", id: crypto.randomUUID() },
       ]);
     } finally {
       setLoading(false);
