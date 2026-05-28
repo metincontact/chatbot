@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+
 export function ChatMessage({ message, sender }) {
   const isUser = sender === "user";
 
@@ -22,7 +24,13 @@ export function ChatMessage({ message, sender }) {
             : "bg-slate-700 text-slate-100 rounded-bl-sm"
         }`}
       >
-        {message}
+        {isUser ? (
+          message
+        ) : (
+          <div className="markdown-content">
+            <ReactMarkdown>{message}</ReactMarkdown>
+          </div>
+        )}
       </div>
     </div>
   );
