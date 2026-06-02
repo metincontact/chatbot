@@ -4,6 +4,7 @@ import { ChatInput } from "./components/ChatInput";
 
 function App() {
   const [chatMessages, setChatMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
@@ -20,12 +21,14 @@ function App() {
         </div>
 
         {/* Messages */}
-        <ChatMessages chatMessages={chatMessages} />
+        <ChatMessages chatMessages={chatMessages} loading={loading} />
 
         {/* Input */}
         <ChatInput
           chatMessages={chatMessages}
           setChatMessages={setChatMessages}
+          loading={loading}
+          setLoading={setLoading}
         />
       </div>
     </div>
