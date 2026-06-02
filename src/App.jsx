@@ -18,6 +18,14 @@ function App() {
             <h1 className="text-white font-semibold">AI Assistant</h1>
             <p className="text-green-400 text-xs">Online</p>
           </div>
+          {chatMessages.length > 0 && (
+            <button
+              onClick={() => setChatMessages([])}
+              className="ml-auto text-slate-400 hover:text-slate-200 text-xs transition"
+            >
+              Clear chat
+            </button>
+          )}
         </div>
 
         {/* Messages */}
