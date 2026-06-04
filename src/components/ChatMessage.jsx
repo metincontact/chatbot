@@ -79,7 +79,7 @@ export function ChatMessage({ message, sender, timestamp }) {
           {isUser ? (
             message
           ) : (
-            <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-slate-100 prose-code:before:content-none prose-code:after:content-none">
+            <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-slate-100 prose-headings:text-sm prose-headings:font-semibold prose-h1:text-base prose-code:before:content-none prose-code:after:content-none">
               <ReactMarkdown components={markdownComponents}>{message}</ReactMarkdown>
             </div>
           )}
