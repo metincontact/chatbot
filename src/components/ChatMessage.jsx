@@ -33,6 +33,7 @@ const markdownComponents = {
           language={match[1]}
           PreTag="div"
           className="rounded-lg text-sm my-2"
+          customStyle={{ overflowX: "auto", maxWidth: "100%" }}
           {...props}
         >
           {String(children).replace(/\n$/, "")}
@@ -68,7 +69,7 @@ export function ChatMessage({ message, sender, timestamp }) {
         {isUser ? "👤" : "🤖"}
       </div>
 
-      <div className={`flex flex-col gap-1 max-w-[75%] ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`flex flex-col gap-1 ${isUser ? "max-w-[75%] items-end" : "max-w-[85%] items-start"}`}>
         <div
           className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
             isUser
