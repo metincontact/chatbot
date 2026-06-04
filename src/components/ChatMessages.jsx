@@ -1,7 +1,13 @@
 import { useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
 
-export function ChatMessages({ chatMessages, loading }) {
+const SUGGESTIONS = [
+  "Explain React hooks in simple terms",
+  "Write a Python function to sort a list",
+  "What's the difference between == and === in JavaScript?",
+];
+
+export function ChatMessages({ messages, loading, onSuggestion }) {
   const chatMessagesRef = useRef(null);
 
   useEffect(() => {
@@ -9,34 +15,54 @@ export function ChatMessages({ chatMessages, loading }) {
     if (containerElem) {
       containerElem.scrollTop = containerElem.scrollHeight;
     }
-  }, [chatMessages, loading]);
+  }, [messages, loading]);
 
   return (
     <div
       ref={chatMessagesRef}
+      role="log"
+      aria-label="Chat messages"
+      aria-live="polite"
+      aria-relevant="additions"
       className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 scrollbar-none"
     >
-      {chatMessages.length === 0 && !loading && (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-slate-500 text-sm">
-            Send a message to start chatting
-          </p>
+      {messages.length === 0 && !loading && (
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 py-8">
+          <div className="text-center">
+            <div className="text-5xl mb-3" aria-hidden="true">🤖</div>
+            <h2 className="text-white font-semibold text-lg">How can I help you?</h2>
+            <p className="text-slate-400 text-sm mt-1">Ask me anything — I'm powered by Gemini AI.</p>
+          </div>
+          <div className="flex flex-col gap-2 w-full max-w-sm">
+            {SUGGESTIONS.map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => onSuggestion(suggestion)}
+                className="text-left text-sm text-slate-300 bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
         </div>
       )}
-      {chatMessages.map((chatMessage) => (
+
+      {messages.map((msg) => (
         <ChatMessage
-          message={chatMessage.message}
-          sender={chatMessage.sender}
-          key={chatMessage.id}
+          message={msg.message}
+          sender={msg.sender}
+          timestamp={msg.timestamp}
+          key={msg.id}
         />
       ))}
+
       {loading && (
-        <div className="flex items-end gap-2">
-          <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-sm shrink-0">
+        <div className="flex items-end gap-2" aria-label="AI is typing">
+          <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-sm shrink-0" aria-hidden="true">
             🤖
           </div>
           <div className="px-4 py-3 rounded-2xl rounded-bl-sm bg-slate-700">
-            <span className="typing-indicator">
+            <span className="typing-indicator" aria-hidden="true">
               <span></span>
               <span></span>
               <span></span>
