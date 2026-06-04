@@ -1,16 +1,24 @@
-import { Component } from "react";
+import { Component, type ReactNode } from "react";
 
-export class ErrorBoundary extends Component {
-  constructor(props) {
+interface Props {
+  children: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(): State {
     return { hasError: true };
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">

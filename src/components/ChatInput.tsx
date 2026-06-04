@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-export function ChatInput({ loading, onSend }) {
+interface ChatInputProps {
+  loading: boolean;
+  onSend: (text: string) => void;
+}
+
+export function ChatInput({ loading, onSend }: ChatInputProps) {
   const [inputText, setInputText] = useState("");
 
   function handleSubmit() {
@@ -9,16 +14,17 @@ export function ChatInput({ loading, onSend }) {
     setInputText("");
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSubmit();
     }
   }
 
-  function handleInput(event) {
-    event.target.style.height = "auto";
-    event.target.style.height = Math.min(event.target.scrollHeight, 128) + "px";
+  function handleInput(event: React.FormEvent<HTMLTextAreaElement>) {
+    const target = event.target as HTMLTextAreaElement;
+    target.style.height = "auto";
+    target.style.height = Math.min(target.scrollHeight, 128) + "px";
   }
 
   return (

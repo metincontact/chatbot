@@ -1,5 +1,12 @@
 import { useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
+import type { Message } from "../types";
+
+interface ChatMessagesProps {
+  messages: Message[];
+  loading: boolean;
+  onSuggestion: (text: string) => void;
+}
 
 const SUGGESTIONS = [
   "Explain React hooks in simple terms",
@@ -7,8 +14,8 @@ const SUGGESTIONS = [
   "Difference between == and === in JavaScript",
 ];
 
-export function ChatMessages({ messages, loading, onSuggestion }) {
-  const chatMessagesRef = useRef(null);
+export function ChatMessages({ messages, loading, onSuggestion }: ChatMessagesProps) {
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const containerElem = chatMessagesRef.current;

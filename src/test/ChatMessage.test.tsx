@@ -18,16 +18,14 @@ describe("ChatMessage", () => {
     const { container } = render(
       <ChatMessage message="Hey" sender="user" timestamp={TIMESTAMP} />
     );
-    const wrapper = container.firstChild;
-    expect(wrapper).toHaveClass("flex-row-reverse");
+    expect(container.firstChild).toHaveClass("flex-row-reverse");
   });
 
   it("aligns bot message to the left", () => {
     const { container } = render(
       <ChatMessage message="Hey" sender="robot" timestamp={TIMESTAMP} />
     );
-    const wrapper = container.firstChild;
-    expect(wrapper).toHaveClass("flex-row");
+    expect(container.firstChild).toHaveClass("flex-row");
   });
 
   it("shows formatted timestamp", () => {

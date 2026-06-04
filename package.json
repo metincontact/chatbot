@@ -7,7 +7,8 @@
     "start": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "dev": "vite",
     "dev:server": "node server.js",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
@@ -33,6 +34,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^4.4.1",
     "concurrently": "^10.0.3",
     "eslint": "^9.25.0",
@@ -41,6 +43,7 @@
     "globals": "^16.0.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
+    "typescript": "^6.0.3",
     "vite": "^6.3.5",
     "vitest": "^4.1.8"
   }

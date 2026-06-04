@@ -4,7 +4,7 @@ import { useChat } from "../hooks/useChat";
 const MOCK_REPLY = "Hello from AI";
 
 function mockFetchSuccess(text = MOCK_REPLY) {
-  global.fetch = vi.fn().mockResolvedValue({
+  globalThis.fetch = vi.fn().mockResolvedValue({
     ok: true,
     status: 200,
     json: () =>
@@ -15,7 +15,7 @@ function mockFetchSuccess(text = MOCK_REPLY) {
 }
 
 function mockFetchError(status = 500) {
-  global.fetch = vi.fn().mockResolvedValue({
+  globalThis.fetch = vi.fn().mockResolvedValue({
     ok: false,
     status,
     json: () => Promise.resolve({}),
@@ -38,39 +38,26 @@ describe("useChat", () => {
     mockFetchSuccess();
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Hi");
-    });
+    act(() => { result.current.sendMessage("Hi"); });
 
-    expect(result.current.messages[0]).toMatchObject({
-      message: "Hi",
-      sender: "user",
-    });
+    expect(result.current.messages[0]).toMatchObject({ message: "Hi", sender: "user" });
   });
 
   it("adds bot reply after API responds", async () => {
     mockFetchSuccess("Hello from AI");
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Hi");
-    });
-
+    act(() => { result.current.sendMessage("Hi"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.messages[1]).toMatchObject({
-      message: "Hello from AI",
-      sender: "robot",
-    });
+    expect(result.current.messages[1]).toMatchObject({ message: "Hello from AI", sender: "robot" });
   });
 
   it("sets loading to true while waiting for response", async () => {
     mockFetchSuccess();
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Hi");
-    });
+    act(() => { result.current.sendMessage("Hi"); });
 
     expect(result.current.loading).toBe(true);
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -80,10 +67,7 @@ describe("useChat", () => {
     mockFetchError(500);
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Hi");
-    });
-
+    act(() => { result.current.sendMessage("Hi"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.messages[1]).toMatchObject({
@@ -95,9 +79,7 @@ describe("useChat", () => {
   it("ignores empty or whitespace-only messages", () => {
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("   ");
-    });
+    act(() => { result.current.sendMessage("   "); });
 
     expect(result.current.messages).toHaveLength(0);
   });
@@ -106,14 +88,10 @@ describe("useChat", () => {
     mockFetchSuccess();
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Hi");
-    });
+    act(() => { result.current.sendMessage("Hi"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    act(() => {
-      result.current.clearChat();
-    });
+    act(() => { result.current.clearChat(); });
 
     expect(result.current.messages).toHaveLength(0);
   });
@@ -122,13 +100,10 @@ describe("useChat", () => {
     mockFetchSuccess();
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Persist me");
-    });
-
+    act(() => { result.current.sendMessage("Persist me"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    const stored = JSON.parse(localStorage.getItem("chat_messages"));
+    const stored = JSON.parse(localStorage.getItem("chat_messages") ?? "[]") as { message: string }[];
     expect(stored).toHaveLength(2);
     expect(stored[0].message).toBe("Persist me");
   });
@@ -148,14 +123,10 @@ describe("useChat", () => {
     mockFetchSuccess();
     const { result } = renderHook(() => useChat());
 
-    act(() => {
-      result.current.sendMessage("Hi");
-    });
+    act(() => { result.current.sendMessage("Hi"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    act(() => {
-      result.current.clearChat();
-    });
+    act(() => { result.current.clearChat(); });
 
     expect(localStorage.getItem("chat_messages")).toBeNull();
   });

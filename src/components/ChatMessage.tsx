@@ -9,6 +9,7 @@ import bash from "react-syntax-highlighter/dist/esm/languages/prism/bash";
 import css from "react-syntax-highlighter/dist/esm/languages/prism/css";
 import json from "react-syntax-highlighter/dist/esm/languages/prism/json";
 import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
+import type { Message } from "../types";
 
 SyntaxHighlighter.registerLanguage("javascript", javascript);
 SyntaxHighlighter.registerLanguage("typescript", typescript);
@@ -18,13 +19,23 @@ SyntaxHighlighter.registerLanguage("css", css);
 SyntaxHighlighter.registerLanguage("json", json);
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
-function formatTime(isoString) {
-  if (!isoString) return "";
-  return new Date(isoString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+type ChatMessageProps = Pick<Message, "message" | "sender" | "timestamp">;
+
+interface CodeProps {
+  inline?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+function formatTime(isoString: string): string {
+  return new Date(isoString).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 const markdownComponents = {
-  code({ inline, className, children, ...props }) {
+  code({ inline, className, children, ...props }: CodeProps) {
     const match = /language-(\w+)/.exec(className || "");
     if (!inline && match) {
       return (
@@ -48,7 +59,7 @@ const markdownComponents = {
   },
 };
 
-export function ChatMessage({ message, sender, timestamp }) {
+export function ChatMessage({ message, sender, timestamp }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
   const isUser = sender === "user";
 

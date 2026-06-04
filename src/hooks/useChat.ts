@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
+import type { Message } from "../types";
 
 const STORAGE_KEY = "chat_messages";
 const MAX_CONTEXT = 10;
 
-async function callApi(contents, retries = 3, delay = 1000) {
+async function callApi(
+  contents: { role: string; parts: { text: string }[] }[],
+  retries = 3,
+  delay = 1000
+): Promise<unknown> {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -25,11 +30,15 @@ async function callApi(contents, retries = 3, delay = 1000) {
   return response.json();
 }
 
+interface ApiResponse {
+  candidates?: { content: { parts: { text: string }[] } }[];
+}
+
 export function useChat() {
-  const [messages, setMessages] = useState(() => {
+  const [messages, setMessages] = useState<Message[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      return saved ? (JSON.parse(saved) as Message[]) : [];
     } catch {
       return [];
     }
@@ -47,10 +56,10 @@ export function useChat() {
     }
   }, [messages]);
 
-  async function sendMessage(inputText) {
+  async function sendMessage(inputText: string): Promise<void> {
     if (!inputText.trim() || loading) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       message: inputText,
       sender: "user",
       id: crypto.randomUUID(),
@@ -70,7 +79,7 @@ export function useChat() {
     ];
 
     try {
-      const data = await callApi(contents);
+      const data = (await callApi(contents)) as ApiResponse;
       const reply =
         data.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Sorry, I could not generate a response.";
@@ -85,9 +94,10 @@ export function useChat() {
         },
       ]);
     } catch (error) {
-      const message = error.message.includes("429")
-        ? "Too many requests. Please wait a moment and try again."
-        : "Something went wrong. Please try again.";
+      const message =
+        error instanceof Error && error.message.includes("429")
+          ? "Too many requests. Please wait a moment and try again."
+          : "Something went wrong. Please try again.";
 
       setMessages([
         ...newMessages,
@@ -103,7 +113,7 @@ export function useChat() {
     }
   }
 
-  function clearChat() {
+  function clearChat(): void {
     setMessages([]);
     localStorage.removeItem(STORAGE_KEY);
   }
