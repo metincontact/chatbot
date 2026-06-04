@@ -29,7 +29,7 @@ export function ChatInput({ loading, onSend }) {
       <textarea
         id="chat-input"
         rows={1}
-        placeholder={loading ? "Thinking..." : "Type a message... (Shift+Enter for new line)"}
+        placeholder={loading ? "Thinking..." : "Message..."}
         onChange={(e) => setInputText(e.target.value)}
         onKeyDown={handleKeyDown}
         onInput={handleInput}

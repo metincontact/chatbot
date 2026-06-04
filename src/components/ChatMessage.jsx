@@ -1,10 +1,51 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import javascript from "react-syntax-highlighter/dist/esm/languages/prism/javascript";
+import typescript from "react-syntax-highlighter/dist/esm/languages/prism/typescript";
+import python from "react-syntax-highlighter/dist/esm/languages/prism/python";
+import bash from "react-syntax-highlighter/dist/esm/languages/prism/bash";
+import css from "react-syntax-highlighter/dist/esm/languages/prism/css";
+import json from "react-syntax-highlighter/dist/esm/languages/prism/json";
+import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
+
+SyntaxHighlighter.registerLanguage("javascript", javascript);
+SyntaxHighlighter.registerLanguage("typescript", typescript);
+SyntaxHighlighter.registerLanguage("python", python);
+SyntaxHighlighter.registerLanguage("bash", bash);
+SyntaxHighlighter.registerLanguage("css", css);
+SyntaxHighlighter.registerLanguage("json", json);
+SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 function formatTime(isoString) {
   if (!isoString) return "";
   return new Date(isoString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
+
+const markdownComponents = {
+  code({ inline, className, children, ...props }) {
+    const match = /language-(\w+)/.exec(className || "");
+    if (!inline && match) {
+      return (
+        <SyntaxHighlighter
+          style={oneDark}
+          language={match[1]}
+          PreTag="div"
+          className="rounded-lg text-sm my-2"
+          {...props}
+        >
+          {String(children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      );
+    }
+    return (
+      <code className="bg-slate-900 text-blue-300 px-1.5 py-0.5 rounded text-sm" {...props}>
+        {children}
+      </code>
+    );
+  },
+};
 
 export function ChatMessage({ message, sender, timestamp }) {
   const [copied, setCopied] = useState(false);
@@ -38,8 +79,8 @@ export function ChatMessage({ message, sender, timestamp }) {
           {isUser ? (
             message
           ) : (
-            <div className="markdown-content">
-              <ReactMarkdown>{message}</ReactMarkdown>
+            <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-slate-100 prose-code:before:content-none prose-code:after:content-none">
+              <ReactMarkdown components={markdownComponents}>{message}</ReactMarkdown>
             </div>
           )}
         </div>

@@ -4,7 +4,7 @@ import { ChatMessage } from "./ChatMessage";
 const SUGGESTIONS = [
   "Explain React hooks in simple terms",
   "Write a Python function to sort a list",
-  "What's the difference between == and === in JavaScript?",
+  "Difference between == and === in JavaScript",
 ];
 
 export function ChatMessages({ messages, loading, onSuggestion }) {
@@ -31,14 +31,14 @@ export function ChatMessages({ messages, loading, onSuggestion }) {
           <div className="text-center">
             <div className="text-5xl mb-3" aria-hidden="true">🤖</div>
             <h2 className="text-white font-semibold text-lg">How can I help you?</h2>
-            <p className="text-slate-400 text-sm mt-1">Ask me anything — I'm powered by Gemini AI.</p>
+            <p className="text-slate-400 text-sm mt-1">Ask me anything.</p>
           </div>
           <div className="flex flex-col gap-2 w-full max-w-sm">
             {SUGGESTIONS.map((suggestion) => (
               <button
                 key={suggestion}
                 onClick={() => onSuggestion(suggestion)}
-                className="text-left text-sm text-slate-300 bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition"
+                className="text-left text-sm text-slate-300 bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition h-12 flex items-center"
               >
                 {suggestion}
               </button>
