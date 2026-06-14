@@ -4,11 +4,15 @@ import type { Message } from "../types";
 const STORAGE_KEY = "chat_messages";
 const MAX_CONTEXT = 10;
 
+interface ApiResponse {
+  candidates?: { content: { parts: { text: string }[] } }[];
+}
+
 async function callApi(
   contents: { role: string; parts: { text: string }[] }[],
   retries = 3,
   delay = 1000
-): Promise<unknown> {
+): Promise<ApiResponse> {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -27,11 +31,7 @@ async function callApi(
     throw new Error(`API error: ${response.status}`);
   }
 
-  return response.json();
-}
-
-interface ApiResponse {
-  candidates?: { content: { parts: { text: string }[] } }[];
+  return response.json() as Promise<ApiResponse>;
 }
 
 export function useChat() {
@@ -60,7 +60,7 @@ export function useChat() {
     if (!inputText.trim() || loading) return;
 
     const userMessage: Message = {
-      message: inputText,
+      text: inputText,
       sender: "user",
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
@@ -73,13 +73,13 @@ export function useChat() {
     const contents = [
       ...messages.slice(-MAX_CONTEXT).map((msg) => ({
         role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.message }],
+        parts: [{ text: msg.text }],
       })),
       { role: "user", parts: [{ text: inputText }] },
     ];
 
     try {
-      const data = (await callApi(contents)) as ApiResponse;
+      const data = await callApi(contents);
       const reply =
         data.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Sorry, I could not generate a response.";
@@ -87,14 +87,14 @@ export function useChat() {
       setMessages([
         ...newMessages,
         {
-          message: reply,
+          text: reply,
           sender: "robot",
           id: crypto.randomUUID(),
           timestamp: new Date().toISOString(),
         },
       ]);
     } catch (error) {
-      const message =
+      const text =
         error instanceof Error && error.message.includes("429")
           ? "Too many requests. Please wait a moment and try again."
           : "Something went wrong. Please try again.";
@@ -102,7 +102,7 @@ export function useChat() {
       setMessages([
         ...newMessages,
         {
-          message,
+          text,
           sender: "robot",
           id: crypto.randomUUID(),
           timestamp: new Date().toISOString(),
@@ -115,7 +115,6 @@ export function useChat() {
 
   function clearChat(): void {
     setMessages([]);
-    localStorage.removeItem(STORAGE_KEY);
   }
 
   return { messages, loading, sendMessage, clearChat };

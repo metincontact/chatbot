@@ -56,7 +56,7 @@ export function ChatMessages({ messages, loading, onSuggestion }: ChatMessagesPr
 
       {messages.map((msg) => (
         <ChatMessage
-          message={msg.message}
+          text={msg.text}
           sender={msg.sender}
           timestamp={msg.timestamp}
           key={msg.id}

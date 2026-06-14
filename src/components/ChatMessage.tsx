@@ -19,10 +19,9 @@ SyntaxHighlighter.registerLanguage("css", css);
 SyntaxHighlighter.registerLanguage("json", json);
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
-type ChatMessageProps = Pick<Message, "message" | "sender" | "timestamp">;
+type ChatMessageProps = Pick<Message, "text" | "sender" | "timestamp">;
 
 interface CodeProps {
-  inline?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
@@ -35,9 +34,9 @@ function formatTime(isoString: string): string {
 }
 
 const markdownComponents = {
-  code({ inline, className, children, ...props }: CodeProps) {
+  code({ className, children, ...props }: CodeProps) {
     const match = /language-(\w+)/.exec(className || "");
-    if (!inline && match) {
+    if (match) {
       return (
         <SyntaxHighlighter
           style={oneDark}
@@ -59,14 +58,17 @@ const markdownComponents = {
   },
 };
 
-export function ChatMessage({ message, sender, timestamp }: ChatMessageProps) {
+export function ChatMessage({ text, sender, timestamp }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
   const isUser = sender === "user";
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(message);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+    }
   }
 
   return (
@@ -89,10 +91,10 @@ export function ChatMessage({ message, sender, timestamp }: ChatMessageProps) {
           }`}
         >
           {isUser ? (
-            message
+            text
           ) : (
             <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-slate-100 prose-headings:text-sm prose-headings:font-semibold prose-h1:text-base prose-code:before:content-none prose-code:after:content-none">
-              <ReactMarkdown components={markdownComponents}>{message}</ReactMarkdown>
+              <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>
             </div>
           )}
         </div>

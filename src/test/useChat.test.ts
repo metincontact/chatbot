@@ -40,7 +40,7 @@ describe("useChat", () => {
 
     act(() => { result.current.sendMessage("Hi"); });
 
-    expect(result.current.messages[0]).toMatchObject({ message: "Hi", sender: "user" });
+    expect(result.current.messages[0]).toMatchObject({ text: "Hi", sender: "user" });
   });
 
   it("adds bot reply after API responds", async () => {
@@ -50,7 +50,7 @@ describe("useChat", () => {
     act(() => { result.current.sendMessage("Hi"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.messages[1]).toMatchObject({ message: "Hello from AI", sender: "robot" });
+    expect(result.current.messages[1]).toMatchObject({ text: "Hello from AI", sender: "robot" });
   });
 
   it("sets loading to true while waiting for response", async () => {
@@ -71,7 +71,7 @@ describe("useChat", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.messages[1]).toMatchObject({
-      message: "Something went wrong. Please try again.",
+      text: "Something went wrong. Please try again.",
       sender: "robot",
     });
   });
@@ -103,20 +103,20 @@ describe("useChat", () => {
     act(() => { result.current.sendMessage("Persist me"); });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    const stored = JSON.parse(localStorage.getItem("chat_messages") ?? "[]") as { message: string }[];
+    const stored = JSON.parse(localStorage.getItem("chat_messages") ?? "[]") as { text: string }[];
     expect(stored).toHaveLength(2);
-    expect(stored[0].message).toBe("Persist me");
+    expect(stored[0].text).toBe("Persist me");
   });
 
   it("loads persisted messages from localStorage on init", () => {
     const saved = [
-      { id: "1", message: "Saved message", sender: "user", timestamp: new Date().toISOString() },
+      { id: "1", text: "Saved message", sender: "user", timestamp: new Date().toISOString() },
     ];
     localStorage.setItem("chat_messages", JSON.stringify(saved));
 
     const { result } = renderHook(() => useChat());
     expect(result.current.messages).toHaveLength(1);
-    expect(result.current.messages[0].message).toBe("Saved message");
+    expect(result.current.messages[0].text).toBe("Saved message");
   });
 
   it("clears localStorage on clearChat", async () => {

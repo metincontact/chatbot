@@ -1,65 +1,66 @@
-# AI Chatbot
+# Chatbot
 
-A chatbot app built with React, powered by Google Gemini 2.5 Flash.
-
-## Live Demo
-
-https://metin-chatbot.vercel.app
-
-## Features
-
-- Real-time conversation with Gemini 2.5 Flash
-- Markdown rendering in AI responses (code blocks, lists, bold, etc.)
-- Typing indicator while waiting for a reply
-- Multiline input with Shift+Enter
-- Conversation history preserved across page refreshes (localStorage)
-- Message timestamps and one-click copy
-- Suggested prompts on the welcome screen
-- Rate limiting on the backend (20 requests/minute)
-- Error boundary — app recovers gracefully from unexpected errors
-- Accessible: ARIA labels, live regions, keyboard navigation
+A chat interface built with React and the Gemini API. Conversations are stored in localStorage so they persist between page refreshes.
 
 ## Stack
 
-- React 19 + Vite
-- Tailwind CSS v4
-- Google Gemini API (gemini-2.5-flash)
-- Express (backend proxy to keep the API key server-side)
+- **React 19** + **TypeScript**
+- **Vite** for bundling
+- **Tailwind CSS** for styling
+- **Express** backend to proxy API requests (keeps the API key off the client)
+- **Vitest** + Testing Library for tests
 
-## Running Locally
+## Getting started
+
+You'll need a [Gemini API key](https://aistudio.google.com/app/apikey).
 
 ```bash
-git clone https://github.com/metincontact/chatbot.git
-cd chatbot
+# Install dependencies
 npm install
-```
 
-Create a `.env` file in the root:
+# Copy the example env file and fill in your key
+cp .env.example .env
 
-```
-GEMINI_API_KEY=your_api_key_here
-```
-
-Start both the Vite dev server and Express backend together:
-
-```bash
+# Start both the frontend and backend
 npm start
 ```
 
-App runs at `http://localhost:5173`. The Express server runs on port `3001` and proxies all Gemini API calls so the key is never exposed in the browser.
+The app runs at `http://localhost:5173`, the backend at `http://localhost:3001`.
 
-## Project Structure
+## Scripts
+
+```bash
+npm start          # dev frontend + backend together
+npm test           # run tests
+npm run build      # production build
+npm run lint       # ESLint
+npm run typecheck
+```
+
+## Deploying to Vercel
+
+The `api/chat.js` file is a Vercel serverless function — deploying the repo to Vercel should work out of the box. Just set `GEMINI_API_KEY` in your project's environment variables.
+
+## Project structure
 
 ```
 src/
-├── components/
-│   ├── ChatInput.jsx      # Message input with auto-resize textarea
-│   ├── ChatMessage.jsx    # Single message bubble with copy + timestamp
-│   ├── ChatMessages.jsx   # Scrollable message list + welcome screen
-│   └── ErrorBoundary.jsx  # Catches runtime errors gracefully
-├── hooks/
-│   └── useChat.js         # All chat state, API logic, localStorage
-├── App.jsx
-└── main.jsx
-server.js                  # Express API proxy with CORS + rate limiting
+  components/
+    ChatInput.tsx      # textarea + send button
+    ChatMessage.tsx    # renders a single message (markdown + syntax highlighting)
+    ChatMessages.tsx   # message list + typing indicator
+    ErrorBoundary.tsx
+  hooks/
+    useChat.ts         # all state logic, API calls, localStorage
+  types.ts
+lib/
+  gemini.js            # shared Gemini fetch logic
+server.js              # Express proxy for local development
+api/chat.js            # Vercel serverless function
 ```
+
+## Notes
+
+- Rate limiting is handled on the backend (20 req/min). The client retries automatically on 429s with exponential backoff.
+- Context sent to the API is capped at the last 10 messages to keep token usage reasonable.
+- Syntax highlighting supports JS, TS, Python, Bash, CSS, JSON, and JSX.
